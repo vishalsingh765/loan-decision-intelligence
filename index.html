@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>Loan Predictor Pro · Vishal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <style>
+        /* ---------- reset & base ---------- */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-start: #eef3fa;
+            --bg-end: #d5e0ec;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-border: rgba(255, 255, 255, 0.5);
+            --shadow-heavy: 0 30px 60px -16px rgba(0, 20, 40, 0.35);
+            --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.04);
+            --radius-xl: 2.8rem;
+            --radius-md: 1.6rem;
+            --radius-sm: 1rem;
+            --primary: #1a5a7a;
+            --primary-light: #2b7aa0;
+            --primary-dark: #0d3b52;
+            --accent: #0f8b7a;
+            --accent-light: #19b09b;
+            --text-dark: #0b1f2b;
+            --text-muted: #3f5568;
+            --text-light: #7a8fa3;
+            --success: #1b8c3c;
+            --success-bg: #e3f5ea;
+            --danger: #b22234;
+            --danger-bg: #fde8e7;
+            --border-light: #e1e9f0;
+            --input-bg: #f9fbfd;
+            --transition: 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(145deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            min-height: 100vh;
+            padding: 2rem 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ---------- main card ---------- */
+        .prediction-container {
+            max-width: 920px;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(2px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-heavy), var(--shadow-soft);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+            border: 1px solid var(--card-border);
+        }
+
+        /* ---------- header ---------- */
+        .form-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
+            padding: 1.8rem 2.4rem;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .form-header::after {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .form-header::before {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: 20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-brand .icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .header-brand h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            line-height: 1.2;
+        }
+        .header-brand h1 span {
+            font-weight: 300;
+            opacity: 0.8;
+            font-size: 0.9rem;
+            display: block;
+            letter-spacing: 0.3px;
+        }
+
+        .header-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            padding: 0.4rem 1.2rem;
+            border-radius: 60px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .header-badge .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #7ed9b0;
+            animation: pulse-dot 1.8s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(0.7);
+            }
+        }
+
+        .header-sub {
+            margin-top: 0.6rem;
+            font-size: 0.92rem;
+            opacity: 0.85;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem 1.2rem;
+        }
+        .header-sub .sep {
+            opacity: 0.3;
+        }
+
+        /* ---------- form body ---------- */
+        .form-body {
+            padding: 2rem 2.4rem 1.6rem;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.4rem 2rem;
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .input-field.full-width {
+            grid-column: span 2;
+        }
+
+        .input-field label {
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .input-field label .label-icon {
+            font-size: 1rem;
+            font-style: normal;
+        }
+        .input-field label .badge-helper {
+            background: #eef3f8;
+            border-radius: 30px;
+            padding: 0.1rem 0.7rem;
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: none;
+            letter-spacing: 0;
+            margin-left: auto;
+        }
+
+        .input-field input,
+        .input-field select {
+            background: var(--input-bg);
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 1.1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: var(--transition);
+            outline: none;
+            width: 100%;
+            font-family: inherit;
+        }
+        .input-field input:focus,
+        .input-field select:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(43, 122, 160, 0.12);
+            background: #fff;
+        }
+        .input-field input:hover,
+        .input-field select:hover {
+            border-color: #b8ccdb;
+        }
+
+        .input-field .hint {
+            font-size: 0.68rem;
+            color: var(--text-light);
+            margin-top: 2px;
+            letter-spacing: 0.2px;
+        }
+
+        /* ---------- action buttons ---------- */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-predict {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border: none;
+            padding: 0.9rem 2.2rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 14px rgba(26, 90, 122, 0.30);
+            letter-spacing: 0.2px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-predict::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent 60%);
+            pointer-events: none;
+            border-radius: 60px;
+        }
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px -6px rgba(26, 90, 122, 0.40);
+        }
+        .btn-predict:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(26, 90, 122, 0.25);
+        }
+
+        .btn-reset {
+            background: #f0f4f9;
+            border: 1.5px solid var(--border-light);
+            padding: 0.9rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 0.4;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-reset:hover {
+            background: #e6edf5;
+            border-color: #b8ccdb;
+            color: var(--text-dark);
+        }
+
+        /* ---------- result card ---------- */
+        .result-card {
+            margin: 0.2rem 2.4rem 1.8rem 2.4rem;
+            background: #f7fafd;
+            border-radius: var(--radius-md);
+            padding: 1.4rem 1.8rem;
+            border-left: 5px solid var(--border-light);
+            transition: var(--transition);
+            display: none;
+        }
+        .result-card.visible {
+            display: block;
+            animation: fadeSlideUp 0.35s ease;
+        }
+        @keyframes fadeSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-dark);
+        }
+        .result-header .badge-icon {
+            font-size: 1.8rem;
+        }
+
+        .verdict-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem 1.2rem;
+            margin-top: 0.2rem;
+        }
+        .verdict-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            padding: 0.15rem 1.2rem;
+            border-radius: 60px;
+            display: inline-block;
+        }
+        .verdict-approved {
+            color: var(--success);
+            background: var(--success-bg);
+        }
+        .verdict-rejected {
+            color: var(--danger);
+            background: var(--danger-bg);
+        }
+
+        .verdict-sub {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .result-summary {
+            margin-top: 1rem;
+            background: #fff;
+            border-radius: var(--radius-sm);
+            padding: 0.9rem 1.2rem;
+            border: 1px solid var(--border-light);
+            font-size: 0.78rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.4rem 0.8rem;
+        }
+        .result-summary .item {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            color: var(--text-muted);
+        }
+        .result-summary .item strong {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .result-footer {
+            margin-top: 0.9rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem 1.5rem;
+            padding-top: 0.7rem;
+            border-top: 1px solid var(--border-light);
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        .result-footer .tag {
+            background: #eef3f8;
+            padding: 0.15rem 0.9rem;
+            border-radius: 30px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* loader */
+        .loader-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.4rem 0;
+        }
+        .loader {
+            width: 22px;
+            height: 22px;
+            border: 2.5px solid rgba(26, 90, 122, 0.15);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-msg {
+            background: var(--danger-bg);
+            color: var(--danger);
+            padding: 0.6rem 1.2rem;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        /* ---------- footer ---------- */
+        .form-footer {
+            background: #f1f6fa;
+            text-align: center;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.68rem;
+            color: var(--text-light);
+            border-top: 1px solid var(--border-light);
+            letter-spacing: 0.2px;
+        }
+        .form-footer .highlight {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* ---------- responsive ---------- */
+        @media (max-width: 760px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .input-field.full-width {
+                grid-column: span 1;
+            }
+            .form-body {
+                padding: 1.5rem 1.2rem;
+            }
+            .form-header {
+                padding: 1.4rem 1.2rem;
+            }
+            .header-brand h1 {
+                font-size: 1.3rem;
+            }
+            .header-brand h1 span {
+                font-size: 0.75rem;
+            }
+            .header-badge {
+                font-size: 0.6rem;
+                padding: 0.2rem 0.8rem;
+            }
+            .result-card {
+                margin: 0.2rem 1.2rem 1.4rem;
+                padding: 1rem 1.2rem;
+            }
+            .verdict-text {
+                font-size: 1.4rem;
+                padding: 0.1rem 0.9rem;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .btn-reset {
+                flex: 1;
+            }
+            .result-summary {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem 0.6rem;
+            }
+            .result-summary {
+                grid-template-columns: 1fr;
+            }
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="prediction-container">
+
+        <!-- HEADER -->
+        <header class="form-header">
+            <div class="header-top">
+                <div class="header-brand">
+                    <span class="icon">⚖️</span>
+                    <h1>
+                        Loan Decision Intelligence
+                        <span>by Vishal</span>
+                    </h1>
+                </div>
+                <div class="header-badge">
+                    <span class="dot"></span>
+                    ML · Real‑time
+                </div>
+            </div>
+            <div class="header-sub">
+                <span>Predict approval likelihood</span>
+                <span class="sep">·</span>
+                <span>Risk assessment engine</span>
+                <span class="sep">·</span>
+                <span>Powered by XGBoost</span>
+            </div>
+        </header>
+
+        <!-- FORM BODY -->
+        <div class="form-body">
+            <form id="loanForm" novalidate>
+                <div class="input-grid">
+
+                    <!-- Age -->
+                    <div class="input-field">
+                        <label><span class="label-icon">📅</span> Age <span class="badge-helper">years</span></label>
+                        <input type="number" id="age" name="Age" value="30" step="1" min="18" max="100" required />
+                        <div class="hint">18 – 100</div>
+                    </div>
+
+                    <!-- Income -->
+                    <div class="input-field">
+                        <label><span class="label-icon">💰</span> Annual Income</label>
+                        <input type="number" id="income" name="Income" value="60000" step="1000" min="0" required />
+                        <div class="hint">Gross yearly income ($)</div>
+                    </div>
+
+                    <!-- Loan Amount -->
+                    <div class="input-field">
+                        <label><span class="label-icon">🏦</span> Loan Amount</label>
+                        <input type="number" id="loan_amount" name="Loan_Amount" value="20000" step="1000" min="500" required />
+                        <div class="hint">Principal requested ($)</div>
+                    </div>
+
+                    <!-- Credit Score -->
+                    <div class="input-field">
+                        <label><span class="label-icon">⭐</span> Credit Score <span class="badge-helper">300–850</span></label>
+                        <input type="number" id="credit_score" name="Credit_Score" value="680" step="1" min="300" max="850" required />
+                        <div class="hint">Higher → better odds</div>
+                    </div>
+
+                    <!-- Employment Years -->
+                    <div class="input-field">
+                        <label><span class="label-icon">💼</span> Employment <span class="badge-helper">years</span></label>
+                        <input type="number" id="employment_years" name="Employment_Years" value="2" step="0.5" min="0" max="50" required />
+                        <div class="hint">Full‑time experience</div>
+                    </div>
+
+                    <!-- Education Level -->
+                    <div class="input-field">
+                        <label><span class="label-icon">🎓</span> Education</label>
+                        <select id="education_level" name="Education_Level">
+                            <option value="High School">High School</option>
+                            <option value="Associate">Associate Degree</option>
+                            <option value="Bachelors" selected>Bachelor's Degree</option>
+                            <option value="Masters">Master's Degree</option>
+                            <option value="PhD">PhD / Doctorate</option>
+                        </select>
+                    </div>
+
+                    <!-- Housing Status (full width) -->
+                    <div class="input-field full-width">
+                        <label><span class="label-icon">🏠</span> Housing Status</label>
+                        <select id="housing_status" name="Housing_Status">
+                            <option value="Own" selected>Own</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Mortgage">Mortgage</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" id="predictBtn" class="btn-predict">
+                        🔮 Predict Decision
+                    </button>
+                    <button type="button" id="resetBtn" class="btn-reset">
+                        ⟳ Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- RESULT PANEL -->
+        <div id="resultArea" class="result-card">
+            <!-- dynamically injected -->
+        </div>
+
+        <!-- FOOTER -->
+        <div class="form-footer">
+            <span>⚡ API endpoint: <span class="highlight">https://loan-decision-intelligence.vercel.app/predict</span></span>
+            <span style="opacity:0.4;margin:0 0.6rem;">·</span>
+            <span>Ensure backend is running</span>
+        </div>
+
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        //  DOM refs
+        // --------------------------------------------------------------
+        const predictBtn = document.getElementById('predictBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultArea = document.getElementById('resultArea');
+
+        const ageInput = document.getElementById('age');
+        const incomeInput = document.getElementById('income');
+        const loanAmountInput = document.getElementById('loan_amount');
+        const creditScoreInput = document.getElementById('credit_score');
+        const employmentYearsInput = document.getElementById('employment_years');
+        const educationSelect = document.getElementById('education_level');
+        const housingSelect = document.getElementById('housing_status');
+
+        // --------------------------------------------------------------
+        //  Helpers
+        // --------------------------------------------------------------
+        function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+
+        function buildPayload() {
+            let age = parseInt(ageInput.value, 10) || 30;
+            let income = parseFloat(incomeInput.value) || 0;
+            let loanAmount = parseFloat(loanAmountInput.value) || 500;
+            let creditScore = parseInt(creditScoreInput.value, 10) || 600;
+            let employmentYears = parseFloat(employmentYearsInput.value) || 0;
+
+            age = clamp(age, 18, 100);
+            income = Math.max(0, income);
+            loanAmount = Math.max(500, loanAmount);
+            creditScore = clamp(creditScore, 300, 850);
+            employmentYears = clamp(employmentYears, 0, 50);
+
+            return {
+                Age: age,
+                Income: income,
+                Loan_Amount: loanAmount,
+                Credit_Score: creditScore,
+                Employment_Years: employmentYears,
+                Education_Level: educationSelect.value,
+                Housing_Status: housingSelect.value
+            };
+        }
+
+        function syncInputs(data) {
+            ageInput.value = data.Age;
+            incomeInput.value = data.Income;
+            loanAmountInput.value = data.Loan_Amount;
+            creditScoreInput.value = data.Credit_Score;
+            employmentYearsInput.value = data.Employment_Years;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function showResult(html) {
+            resultArea.classList.add('visible');
+            resultArea.innerHTML = html;
+        }
+
+        function hideResult() {
+            resultArea.classList.remove('visible');
+            resultArea.innerHTML = '';
+        }
+
+        // --------------------------------------------------------------
+        //  Render: loading, error, verdict
+        // --------------------------------------------------------------
+        function renderLoading() {
+            showResult(`
+                <div class="result-header">
+                    <span class="badge-icon">⏳</span>
+                    <span>Analyzing your profile …</span>
+                </div>
+                <div class="loader-wrap">
+                    <div class="loader"></div>
+                    <span style="color:var(--text-muted);font-weight:500;">Connecting to risk engine</span>
+                </div>
+                <div class="result-footer">
+                    <span>⏱️ Please wait — backend is computing decision</span>
+                </div>
+            `);
+        }
+
+        function renderVerdict(verdict, isApproved, data, confidenceMsg, extraMsg) {
+            const badge = isApproved ? '✅' : '❌';
+            const cls = isApproved ? 'verdict-approved' : 'verdict-rejected';
+            const label = isApproved ? 'LOAN APPROVED' : 'LOAN REJECTED';
+            const rec = isApproved ?
+                'Based on your financial profile, the model predicts strong repayment capacity.' :
+                'The model indicates elevated risk. Consider improving credit or reducing debt.';
+
+            const summaryItems = [
+                { label: 'Age', value: data.Age },
+                { label: 'Income', value: `$${data.Income.toLocaleString()}` },
+                { label: 'Loan', value: `$${data.Loan_Amount.toLocaleString()}` },
+                { label: 'Credit', value: data.Credit_Score },
+                { label: 'Experience', value: `${data.Employment_Years} yrs` },
+                { label: 'Education', value: data.Education_Level },
+                { label: 'Housing', value: data.Housing_Status },
+            ];
+
+            const summaryHtml = summaryItems.map(item =>
+                `<div class="item"><strong>${item.label}</strong> ${item.value}</div>`
+            ).join('');
+
+            const confHtml = confidenceMsg ? `<span class="tag">📊 ${escapeHtml(confidenceMsg)}</span>` : '';
+            const extraHtml = extraMsg ? `<span class="tag">📌 ${escapeHtml(extraMsg)}</span>` : '';
+
+            showResult(`
+                <div class="result-header">
+                    <span class="badge-icon">${badge}</span>
+                    <span>Loan Decision Outcome</span>
+                </div>
+                <div class="verdict-row">
+                    <span class="verdict-text ${cls}">${label}</span>
+                    <span class="verdict-sub">${rec}</span>
+                </div>
+                <div class="result-summary">${summaryHtml}</div>
+                <div class="result-footer">
+                    ${confHtml}
+                    ${extraHtml}
+                    <span class="tag">⚡ ${escapeHtml(verdict)}</span>
+                </div>
+            `);
+        }
+
+        function renderError(message) {
+            showResult(`
+                <div class="result-header">
+                    <span class="badge-icon">⚠️</span>
+                    <span>Prediction Error</span>
+                </div>
+                <div class="error-msg">${escapeHtml(message)}</div>
+                <div class="result-footer">
+                    <span>💡 Verify that the ML server is running and accepts POST /predict with JSON.</span>
+                </div>
+            `);
+        }
+
+        // --------------------------------------------------------------
+        //  API call
+        // --------------------------------------------------------------
+        async function callPredictionAPI() {
+            const data = buildPayload();
+            syncInputs(data);
+
+            renderLoading();
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+                const response = await fetch('https://loan-decision-intelligence.vercel.app/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    let errMsg = `HTTP ${response.status}`;
+                    try {
+                        const errJson = await response.json();
+                        errMsg = errJson.message || errJson.error || errMsg;
+                    } catch (_) { /* ignore */ }
+                    throw new Error(errMsg);
+                }
+
+                const result = await response.json();
+
+                // ----- parse prediction -----
+                let raw = result.prediction;
+                let verdict = null;
+                let isApproved = false;
+
+                if (raw !== undefined && raw !== null) {
+                    if (typeof raw === 'string') {
+                        const lower = raw.toLowerCase();
+                        if (lower.includes('approve') || lower === 'approved' || lower === '1') {
+                            isApproved = true;
+                            verdict = 'APPROVED';
+                        } else if (lower.includes('reject') || lower === 'rejected' || lower === '0') {
+                            isApproved = false;
+                            verdict = 'REJECTED';
+                        } else {
+                            const num = Number(raw);
+                            if (!isNaN(num)) {
+                                isApproved = num === 1;
+                                verdict = isApproved ? 'APPROVED' : 'REJECTED';
+                            } else {
+                                verdict = raw.toUpperCase();
+                                isApproved = verdict === 'APPROVED';
+                            }
+                        }
+                    } else if (typeof raw === 'number') {
+                        isApproved = raw === 1;
+                        verdict = isApproved ? 'APPROVED' : 'REJECTED';
+                    } else if (typeof raw === 'boolean') {
+                        isApproved = raw;
+                        verdict = isApproved ? 'APPROVED' : 'REJECTED';
+                    } else {
+                        verdict = 'UNCLEAR';
+                        isApproved = false;
+                    }
+                } else if (result.decision) {
+                    verdict = String(result.decision).toUpperCase();
+                    isApproved = verdict === 'APPROVED' || verdict === 'APPROVE';
+                } else if (result.status) {
+                    verdict = String(result.status).toUpperCase();
+                    isApproved = verdict === 'APPROVED';
+                } else {
+                    throw new Error('Prediction field missing from API response');
+                }
+
+                const confidenceMsg = result.confidence ? `Confidence: ${result.confidence}` :
+                    result.probability ? `Probability: ${result.probability}` : null;
+                const extraMsg = result.message || '';
+
+                renderVerdict(verdict, isApproved, data, confidenceMsg, extraMsg);
+
+            } catch (err) {
+                console.error('Prediction error:', err);
+                let msg = err.message;
+                if (err.name === 'AbortError') {
+                    msg = 'Request timeout — backend not responding. Check if server is running.';
+                } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+                    msg = 'Cannot connect to backend. Ensure Flask server is active at https://loan-decision-intelligence.onrender.com and CORS is enabled.';
+                }
+                renderError(msg);
+            }
+        }
+
+        // --------------------------------------------------------------
+        //  Reset
+        // --------------------------------------------------------------
+        function resetFormFields() {
+            ageInput.value = 30;
+            incomeInput.value = 60000;
+            loanAmountInput.value = 20000;
+            creditScoreInput.value = 680;
+            employmentYearsInput.value = 2;
+            educationSelect.value = 'Bachelors';
+            housingSelect.value = 'Own';
+            hideResult();
+        }
+
+        // --------------------------------------------------------------
+        //  Event listeners
+        // --------------------------------------------------------------
+        predictBtn.addEventListener('click', callPredictionAPI);
+
+        resetBtn.addEventListener('click', () => {
+            resetFormFields();
+        });
+
+        // Enter key on any input triggers prediction
+        document.querySelectorAll('#loanForm input, #loanForm select').forEach(el => {
+            el.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    callPredictionAPI();
+                }
+            });
+        });
+
+        // initial state
+        resetFormFields();
+    </script>
+
+</body>
+</html>
